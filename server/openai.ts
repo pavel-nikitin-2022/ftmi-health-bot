@@ -5,7 +5,7 @@ import { storage } from './storage'
 const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY })
 
 // Максимальное количество сообщений из контекста для промпта
-const MAX_CONTEXT_MESSAGES = 10
+const MAX_CONTEXT_MESSAGES = 3
 
 /**
  * Формируем системный промпт для ChatGPT
@@ -65,7 +65,7 @@ export async function askHealthAI(telegramId: number, userMessage: string) {
       max_completion_tokens: 8192,
     })
 
-    console.log(response);
+    console.log('OpenAI response:', JSON.stringify(response, null, 2))
 
     const aiText =
       response.choices[0].message?.content || 'Извините, не могу ответить.'
