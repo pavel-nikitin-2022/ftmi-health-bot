@@ -5,7 +5,7 @@ import { storage } from './storage'
 const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY })
 
 // Максимальное количество сообщений из контекста для промпта
-const MAX_CONTEXT_MESSAGES = 3
+const MAX_CONTEXT_MESSAGES = 5
 
 /**
  * Формируем системный промпт для ChatGPT
@@ -32,7 +32,7 @@ function buildHealthPrompt(userContext: Record<string, any>) {
 Контекст пользователя: ${basicInfo}
 Последние сообщения пользователя: ${contextSummary}
 Не давай диагнозов и медицинских заключений.
-После каждой рекомендации добавляй фразу: "⚠️ Я не являюсь врачом, не несу ответственности и могу ошибаться."
+После сообщения добавляй фразу: "⚠️ Я не являюсь врачом, не несу ответственности и могу ошибаться."
 Используй короткий, дружелюбный стиль.
 `
 }

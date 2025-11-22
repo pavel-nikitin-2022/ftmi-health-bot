@@ -187,6 +187,7 @@ tgRouter.post(
 
     // --- Все сообщения шлем в AI ---
     if (text && profileComplete) {
+      await bot.sendChatAction(chatId, 'typing')
       const aiResponse = await askHealthAI(telegramId, text)
       await bot.sendMessage(chatId, aiResponse, {
         reply_markup: {
