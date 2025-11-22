@@ -186,9 +186,7 @@ tgRouter.post(
 
     // --- Все сообщения шлем в AI ---
     if (text && profileComplete) {
-      // Проверяем, не занят ли пользователь предыдущим запросом
-      console.log("RESULT USERLOCK", userLocks.get(telegramId), userLocks);
-      
+      // если лок стоит — сразу отвечаем
       if (userLocks.get(telegramId)) {
         await bot.sendMessage(
           chatId,
@@ -197,34 +195,38 @@ tgRouter.post(
         return res.sendStatus(200)
       }
 
-      // Ставим лок
+      // ставим лок
       userLocks.set(telegramId, true)
 
-      try {
-        // Показываем, что бот печатает
-        await bot.sendChatAction(chatId, 'typing')
+      // отвечаем Telegram немедленно!
+      res.sendStatus(200)
 
-        const aiResponse = await askHealthAI(telegramId, text)
+      // запускаем AI в фоне
+      setImmediate(async () => {
+        try {
+          await bot.sendChatAction(chatId, 'typing')
 
-        await bot.sendMessage(chatId, aiResponse, {
-          reply_markup: {
-            inline_keyboard: [
-              [{ text: 'Мой профиль', callback_data: 'profile' }],
-            ],
-          },
-        })
-      } catch (e) {
-        console.error('AI error:', e)
-        await bot.sendMessage(
-          chatId,
-          'Произошла ошибка при обработке запроса 😕'
-        )
-      } finally {
-        // Снимаем лок в любом случае
-        userLocks.set(telegramId, false)
-      }
+          const aiResponse = await askHealthAI(telegramId, text)
 
-      return res.sendStatus(200)
+          await bot.sendMessage(chatId, aiResponse, {
+            reply_markup: {
+              inline_keyboard: [
+                [{ text: 'Мой профиль', callback_data: 'profile' }],
+              ],
+            },
+          })
+        } catch (e) {
+          console.error('AI error:', e)
+          await bot.sendMessage(
+            chatId,
+            'Произошла ошибка при обработке запроса 😕'
+          )
+        } finally {
+          userLocks.set(telegramId, false)
+        }
+      })
+
+      return
     }
 
     res.sendStatus(200)
