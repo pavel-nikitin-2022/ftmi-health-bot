@@ -1,0 +1,29 @@
+{
+  "include": ["server/**/*", "shared/**/*"],
+  "exclude": ["node_modules", "build", "dist", "**/*.test.ts"],
+  "compilerOptions": {
+    "incremental": true,
+    "tsBuildInfoFile": "./node_modules/typescript/tsbuildinfo",
+    "noEmit": true,
+
+    "module": "ESNext",
+    "moduleResolution": "bundler",
+
+    "target": "ESNext",
+    "lib": ["esnext"],
+
+    "strict": true,
+    "esModuleInterop": true,
+    "skipLibCheck": true,
+
+    "allowImportingTsExtensions": true,
+
+    "baseUrl": ".",
+    "types": ["node"],
+
+    "paths": {
+      "@shared/*": ["./shared/*"],
+      "@server/*": ["./server/*"]
+    }
+  }
+}
