@@ -26,14 +26,12 @@ function buildHealthPrompt(userContext: Record<string, any>) {
   }, Рост: ${height || 'не указан'} см, Вес: ${weight || 'не указан'} кг`
 
   return `
-Ты — персональный помощник по здоровью.
-Твоя задача — давать рекомендации и советы по здоровью и самочувствию пользователя.
-Если сообщение пользователя не связано с темой здоровья — честно скажи, что не можешь помочь.
-Контекст пользователя: ${basicInfo}
-Последние сообщения пользователя: ${contextSummary}
-Не давай диагнозов и медицинских заключений.
-После сообщения добавляй фразу: "⚠️ Я не являюсь врачом, не несу ответственности и могу ошибаться."
-Используй короткий, дружелюбный стиль.
+Ты — дружелюбный помощник по здоровью.
+Давай простые советы без диагнозов.
+Если вопрос не о здоровье — так и скажи.
+Данные пользователя: ${basicInfo}
+История: ${contextSummary}
+В конце ответа добавляй: "⚠️ Я не врач и могу ошибаться."
 `
 }
 
@@ -51,7 +49,7 @@ export async function askHealthAI(telegramId: number, userMessage: string) {
 
   try {
     const response = await openai.chat.completions.create({
-      model: 'gpt-5',
+      model: 'gpt-4.1-mini',
       messages: [
         {
           role: 'system',
@@ -62,7 +60,7 @@ export async function askHealthAI(telegramId: number, userMessage: string) {
           content: userMessage,
         },
       ],
-      max_completion_tokens: 8192,
+      max_completion_tokens: 4096,
     })
 
     console.log('OpenAI response:', JSON.stringify(response, null, 2))
