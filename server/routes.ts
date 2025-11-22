@@ -9,6 +9,7 @@ import { askHealthAI } from './openai'
 export const tgRouter = Router()
 
 const MAX_DIALOG_HISTORY = 50
+const userLocks = new Map<number, boolean>()
 
 tgRouter.post(
   `/webhook/${process.env.TELEGRAM_BOT_TOKEN}`,
@@ -165,9 +166,7 @@ tgRouter.post(
       await bot.sendMessage(chatId, 'Вы уже зарегистрированы!', {
         reply_markup: {
           inline_keyboard: [
-            [
-              { text: 'Мой профиль', callback_data: 'profile' },
-            ],
+            [{ text: 'Мой профиль', callback_data: 'profile' }],
           ],
         },
       })
@@ -187,17 +186,42 @@ tgRouter.post(
 
     // --- Все сообщения шлем в AI ---
     if (text && profileComplete) {
-      await bot.sendChatAction(chatId, 'typing')
-      const aiResponse = await askHealthAI(telegramId, text)
-      await bot.sendMessage(chatId, aiResponse, {
-        reply_markup: {
-          inline_keyboard: [
-            [
-              { text: 'Мой профиль', callback_data: 'profile' },
+      // Проверяем, не занят ли пользователь предыдущим запросом
+      if (userLocks.get(telegramId)) {
+        await bot.sendMessage(
+          chatId,
+          'Не так часто, предыдущий запрос не успел обработаться'
+        )
+        return res.sendStatus(200)
+      }
+
+      // Ставим лок
+      userLocks.set(telegramId, true)
+
+      try {
+        // Показываем, что бот печатает
+        await bot.sendChatAction(chatId, 'typing')
+
+        const aiResponse = await askHealthAI(telegramId, text)
+
+        await bot.sendMessage(chatId, aiResponse, {
+          reply_markup: {
+            inline_keyboard: [
+              [{ text: 'Мой профиль', callback_data: 'profile' }],
             ],
-          ],
-        },
-      })
+          },
+        })
+      } catch (e) {
+        console.error('AI error:', e)
+        await bot.sendMessage(
+          chatId,
+          'Произошла ошибка при обработке запроса 😕'
+        )
+      } finally {
+        // Снимаем лок в любом случае
+        userLocks.set(telegramId, false)
+      }
+
       return res.sendStatus(200)
     }
 
