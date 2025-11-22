@@ -156,7 +156,7 @@ tgRouter.post(
       }
       if (!ctx.weight) {
         await storage.updateUserContextField(telegramId, 'weight', text)
-        await bot.sendMessage(chatId, 'Профиль заполнен! ✅')
+        await bot.sendMessage(chatId, 'Профиль заполнен! ✅\nТеперь ты можешь писать сюда свои вопросы, а я на них найду ответ!')
         return res.sendStatus(200)
       }
     }
