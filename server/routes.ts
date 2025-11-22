@@ -187,6 +187,8 @@ tgRouter.post(
     // --- Все сообщения шлем в AI ---
     if (text && profileComplete) {
       // Проверяем, не занят ли пользователь предыдущим запросом
+      console.log("RESULT USERLOCK", userLocks.get(telegramId), userLocks);
+      
       if (userLocks.get(telegramId)) {
         await bot.sendMessage(
           chatId,
