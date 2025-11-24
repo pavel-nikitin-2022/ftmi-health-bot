@@ -17,7 +17,7 @@ function buildHealthPrompt(userContext: Record<string, any>) {
   const contextSummary = dialogHistory
     ? dialogHistory
         .slice(-MAX_CONTEXT_MESSAGES)
-        .map((msg) => `${msg.role}: ${msg.text}`)
+        .map((msg: any) => `${msg.role}: ${msg.text}`)
         .join('\n')
     : ''
 
@@ -39,7 +39,7 @@ function buildHealthPrompt(userContext: Record<string, any>) {
  * Отправляет текст пользователя в OpenAI и получает ответ
  */
 export async function askHealthAI(telegramId: number, userMessage: string) {
-  const userContext = await storage.getUserContext(telegramId)
+  const userContext: any = await storage.getUserContext(telegramId)
 
   // Добавляем текущее сообщение в историю (но не сохраняем еще)
   const dialogHistory = userContext.dialogHistory || []
@@ -49,7 +49,7 @@ export async function askHealthAI(telegramId: number, userMessage: string) {
 
   try {
     const response = await openai.chat.completions.create({
-      model: 'gpt-4.1-mini',
+      model: 'gpt-5-mini',
       messages: [
         {
           role: 'system',
